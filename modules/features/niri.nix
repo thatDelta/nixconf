@@ -1,9 +1,8 @@
 { self, inputs, ... }: {
   flake.nixosModules.niri = { pkgs, lib, ... }: {
-    programs.niri = {
-      enable = true;
-      package = self.packages.${pkgs.stdenv.hostPlatform.system}.myNiri;
-    };
+    programs.niri.enable = true;
+    # Do NOT set package here - use standard niri so it reads ~/.config/niri/config.kdl
+    # myNoctalia is in home.packages (via yume.nix) so noctalia-shell is in PATH
   };
 
   perSystem = { pkgs, lib, self', ... }: {

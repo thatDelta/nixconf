@@ -1,0 +1,9 @@
+# Reference repos cloned for study (shin, nixos-dotfiles) - not part of the config
+/WIP/
+
+# `nixos-rebuild build` drops these symlinks into the repo root
+/result
+/result-*
+
+# graphify knowledge-graph output (regenerated with `graphify update .`)
+/graphify-out/
