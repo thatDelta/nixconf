@@ -18,6 +18,7 @@
 {
   imports = [
     ./theme.nix      # GTK/Qt theme, icons, cursor
+    ./wallpapers.nix # seeds ~/Pictures/Wallpapers (noctalia derives its colours here)
     ./packages.nix   # applications
     ./shell.nix      # fish, starship, atuin
     ./neovim.nix     # neovim + LazyVim

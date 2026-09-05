@@ -185,7 +185,7 @@
       "screenOverrides": []
     },
     "general": {
-      "avatarImage": "/home/delta/.face",
+      "avatarImage": "",
       "dimmerOpacity": 0.2,
       "showScreenCorners": false,
       "forceBlackScreenCorners": false,
@@ -644,7 +644,7 @@
       "notifyUpdates": true
     },
     "idle": {
-      "enabled": false,
+      "enabled": true,
       "screenOffTimeout": 600,
       "lockTimeout": 660,
       "suspendTimeout": 1800,
