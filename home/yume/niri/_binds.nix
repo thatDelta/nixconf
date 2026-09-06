@@ -33,7 +33,7 @@ let
   # --- your applications ------------------------------------------------
   # Change these four lines to re-point every app keybind below.
   terminal = lib.getExe pkgs.kitty;
-  browser = lib.getExe pkgs.google-chrome;
+  browser = lib.getExe pkgs.firefox;
   fileManager = lib.getExe pkgs.kdePackages.dolphin;
 
   # Mod+C "code editor". Swap the line below for whichever you prefer:

@@ -19,6 +19,7 @@
       coreBoot
       coreLocale
       coreNetwork
+      coreKeyring
       corePower
       coreAudio
       coreUsers

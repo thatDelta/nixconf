@@ -23,7 +23,6 @@
 # =============================================================================
 {
   flake.nixosModules.coreNetwork =
-    { pkgs, ... }:
     {
       networking = {
         networkmanager = {
@@ -46,17 +45,8 @@
         dhcpcd.enable = false;
       };
 
-      # --- the secret agent (see the note at the top of this file) ----------
-      services.gnome.gnome-keyring.enable = true;
-
-      services.dbus.packages = with pkgs; [
-        gcr        # prompts for unlocking the keyring
-        libsecret  # client library apps use to read/write secrets
-      ];
-
-      # Unlock the keyring automatically when you log in, so you are not typing
-      # a second password just to get wifi back after boot.
-      security.pam.services.sddm.enableGnomeKeyring = true;
+      # The secret agent that stores wifi passwords lives in core/keyring.nix,
+      # because the same keyring also holds application logins.
 
       # Boot does not need to block waiting for a network to appear.
       systemd.services.NetworkManager-wait-online.enable = false;

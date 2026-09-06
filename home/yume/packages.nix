@@ -21,7 +21,17 @@ in
 {
   home.packages = (with pkgs; [
 
-    # --- browser ----------------------------------------------------------
+    # --- browsers ---------------------------------------------------------
+    # firefox is the default (Mod+B, and the handler for http/https below).
+    #
+    # Installed as a plain package rather than through `programs.firefox`,
+    # deliberately: that module can manage profiles, and this profile is 1.6GB
+    # of real history/logins living in ~/.config/mozilla. A plain package
+    # install cannot write there at all.
+    #
+    # (Firefox 153+ follows the XDG base directory spec, which is why the
+    # profile is in ~/.config/mozilla and not the older ~/.mozilla.)
+    firefox
     google-chrome
 
     # --- terminals --------------------------------------------------------

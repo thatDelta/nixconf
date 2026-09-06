@@ -30,9 +30,16 @@ in
   gtk = {
     enable = true;
 
+    # WhiteSur is the macOS-style theme. This is what gives GTK windows the
+    # rounded titlebar and the red/yellow/green "traffic light" buttons in
+    # shin's screenshots -- adw-gtk3-dark (used before) is a fine dark theme
+    # but draws standard GNOME window controls, which is why the windows
+    # looked plain by comparison.
+    #
+    # Switch back with:  name = "adw-gtk3-dark"; package = pkgs.adw-gtk3;
     theme = {
-      name = "adw-gtk3-dark";
-      package = pkgs.adw-gtk3;
+      name = "WhiteSur-Dark";
+      package = pkgs.whitesur-gtk-theme;
     };
 
     iconTheme = {
@@ -81,10 +88,8 @@ in
     GSETTINGS_SCHEMA_DIR =
       "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
 
-    # Prefer Wayland everywhere rather than falling back to XWayland, which
-    # blurs on a scaled display.
-    SDL_VIDEODRIVER = "wayland";
-    GTK_USE_PORTAL = "1";
+    # (Behavioural variables -- Wayland preferences, portal and keyring
+    # integration -- live in session.nix.)
   };
 
   # Bookmarks down the side of GTK file dialogs and dolphin.
