@@ -200,7 +200,7 @@
       "lockScreenAnimations": false,
       "lockOnSuspend": true,
       "showSessionButtonsOnLockScreen": true,
-      "showHibernateOnLockScreen": false,
+      "showHibernateOnLockScreen": true,
       "enableLockScreenMediaControls": false,
       "enableShadows": true,
       "enableBlurBehind": true,

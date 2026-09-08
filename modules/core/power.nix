@@ -41,14 +41,37 @@
       lidSwitchExternalPower = "lock";
     };
 
+    # --- hibernation -------------------------------------------------------
+    # Hibernation writes RAM to disk and powers off completely, then restores
+    # the session on next boot. It needs two things, and BOTH must be right --
+    # with only the first, hibernating appears to work and then boots to a
+    # blank session, losing everything.
+    #
+    #   1. swap at least as large as RAM, to hold the image
+    #      this machine: 23G RAM, 25.5G swap partition -- fine
+    #   2. the kernel must be told which device holds that image on resume
+    #      that is boot.resumeDevice below; without it there is no `resume=`
+    #      kernel parameter and the image is never read back
+    #
+    # (zram is also enabled, in core/boot.nix. It is compressed swap living in
+    # RAM, at a higher priority so it gets used first for ordinary swapping.
+    # It cannot hold a hibernation image -- that is what the real partition
+    # below is for. The two coexist fine.)
+    boot.resumeDevice = "/dev/disk/by-uuid/0e88a101-e9da-47bc-8a25-cb6fe658bc9b";
+
     systemd.sleep.settings.Sleep = {
       AllowSuspend = true;
+      AllowHibernation = true;
 
-      # Hibernate is off on purpose: it needs a swap partition at least as
-      # large as your RAM, and this machine uses zram (compressed RAM) rather
-      # than a real swap file, so hibernating would fail at the worst moment.
-      AllowHibernation = false;
-      AllowSuspendThenHibernate = false;
+      # Suspend first, then hibernate after the delay below. This is the good
+      # laptop default: instant wake if you come back soon, no flat battery if
+      # you leave it in a bag for two days.
+      AllowSuspendThenHibernate = true;
+      HibernateDelaySec = "30min";
+
+      # Hybrid sleep writes the image AND stays suspended, so a power loss
+      # while asleep does not lose the session. It makes every suspend slower,
+      # which is why suspend-then-hibernate above is usually the better trade.
       AllowHybridSleep = false;
     };
 
@@ -59,10 +82,9 @@
       percentageLow = 20;
       percentageCritical = 10;
       percentageAction = 5;
-      # PowerOff rather than Hibernate, because hibernation is disabled above.
-      # Asking for an action the system cannot perform would just do nothing
-      # and let the battery die.
-      criticalPowerAction = "PowerOff";
+      # At 5% battery, hibernate rather than power off: the session is written
+      # to disk and comes back when you plug in, instead of being lost.
+      criticalPowerAction = "Hibernate";
     };
 
     # Lets you switch between power-saver / balanced / performance, which the
