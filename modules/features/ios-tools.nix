@@ -48,8 +48,50 @@
 {
   perSystem =
     { pkgs, system, ... }:
-    {
-      packages.iloader = inputs.iloader.packages.${system}.iloader.overrideAttrs (old: {
+    let
+      # ---------------------------------------------------------------------
+      # Apple Root CA -- needed to log in with an Apple ID
+      # ---------------------------------------------------------------------
+      # Signing in goes through https://gsa.apple.com (Apple's "Grand Slam"
+      # auth service), and that host is signed by Apple's OWN private root,
+      # not by a publicly trusted CA. The standard Mozilla/NSS bundle NixOS
+      # ships has 119 roots and Apple Root CA is not among them, so the TLS
+      # handshake fails and iloader reports:
+      #
+      #   Failed to fetch URL Bag
+      #   error sending request for url (https://gsa.apple.com/...)
+      #
+      # (www.apple.com works fine -- it uses a public CA. Only Apple's
+      # internal services use this root.)
+      #
+      # VERIFIED, not blindly trusted: downloaded from Apple over a publicly
+      # trusted connection, and its SHA-256 matches Apple's published
+      # fingerprint for Apple Root CA:
+      #   B0:B1:73:0E:CB:C7:FF:45:05:14:2C:49:F1:29:5E:6E:DA:6B:CA:ED:
+      #   7E:2C:68:C5:BE:91:B5:A1:10:01:F0:24
+      # It is also self-signed (subject == issuer), as a root must be.
+      appleRootCA = pkgs.fetchurl {
+        url = "https://www.apple.com/appleca/AppleIncRootCertificate.cer";
+        hash = "sha256-sLFzDsvH/0UFFCxJ8Slebtpryu1+LGjFvpG1oRAB8CQ=";
+      };
+
+      # The download is DER; a CA bundle has to be PEM.
+      appleRootPEM = pkgs.runCommand "apple-root-ca.pem"
+        { nativeBuildInputs = [ pkgs.openssl ]; }
+        ''
+          openssl x509 -inform DER -in ${appleRootCA} -outform PEM -out $out
+        '';
+
+      # The normal system bundle PLUS Apple's root. Deliberately scoped to
+      # this one program via SSL_CERT_FILE below rather than added to the
+      # system trust store -- only iloader gets the extra trust anchor,
+      # nothing else on the machine is affected.
+      caBundleWithApple = pkgs.runCommand "ca-bundle-with-apple-root.crt" { } ''
+        cat ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt ${appleRootPEM} > $out
+      '';
+    in
+    let
+      iloaderUnwrapped = inputs.iloader.packages.${system}.iloader.overrideAttrs (old: {
         cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
           inherit (old) src;
 
@@ -60,6 +102,27 @@
           hash = "sha256-te7XB/pkM9s94fUJadCtoOvcB/kEN/U1BwQMWcKPglM=";
         };
       });
+    in
+    {
+      # The wrapper is applied on TOP of the built package rather than inside
+      # it (via overrideAttrs/postFixup) on purpose: touching the derivation's
+      # inputs would invalidate it and force all ~718 crates to compile again
+      # for what is only an environment variable.
+      #
+      # iloader's HTTP client is rustls via rustls-native-certs, which reads
+      # SSL_CERT_FILE before falling back to the system trust store.
+      # --set-default means an SSL_CERT_FILE you export yourself still wins.
+      packages.iloader = pkgs.symlinkJoin {
+        name = "iloader-${iloaderUnwrapped.version}";
+        paths = [ iloaderUnwrapped ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+
+        postBuild = ''
+          rm $out/bin/iloader
+          makeWrapper ${iloaderUnwrapped}/bin/iloader $out/bin/iloader \
+            --set-default SSL_CERT_FILE ${caBundleWithApple}
+        '';
+      };
     };
 
   flake.nixosModules.iosTools =
