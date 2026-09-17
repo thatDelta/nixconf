@@ -62,7 +62,23 @@
       });
     };
 
-  flake.nixosModules.iosTools = {
-    services.usbmuxd.enable = true;
-  };
+  flake.nixosModules.iosTools =
+    { pkgs, ... }:
+    {
+      services.usbmuxd.enable = true;
+
+      # Command-line tools for the same usbmuxd that iloader talks to. When
+      # iloader sits on "loading devices" these tell you WHERE it broke,
+      # which the GUI does not:
+      #
+      #   idevice_id -l        list connected devices (empty = usbmuxd cannot
+      #                        reach the device; pairing/lockdownd problem)
+      #   idevicepair validate is this device already trusted?
+      #   idevicepair pair     trigger the "Trust This Computer" prompt
+      #   ideviceinfo          full device info; fails if not yet trusted
+      #
+      # And to watch the daemon side while plugging a device in:
+      #   journalctl -fu usbmuxd
+      environment.systemPackages = [ pkgs.libimobiledevice ];
+    };
 }
