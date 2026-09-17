@@ -47,6 +47,12 @@
     };
 
     sidra.url = "github:wimpysworld/sidra";
+
+    # iOS sideloader. Built from source; see modules/features/ios-tools.nix
+    # for the one patch its flake needs. Deliberately NOT following nixpkgs --
+    # it pins bun2nix and a Tauri/Rust toolchain that its own nixpkgs revision
+    # is known to work with.
+    iloader.url = "github:nab138/iloader";
   };
 
   # Every module under ./modules is imported automatically. Start reading at
