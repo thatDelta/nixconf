@@ -27,6 +27,7 @@
         vim         # a guaranteed editor; neovim is set up per-profile
         wget
         curl
+	opencode-desktop
 
         # --- everyday shell ------------------------------------------------
         fastfetch
@@ -46,5 +47,6 @@
       # /etc/shells entry -- the per-user choice of login shell is in
       # core/users.nix.
       programs.fish.enable = true;
+      services.tailscale.enable = true;
     };
 }

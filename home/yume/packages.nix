@@ -12,7 +12,7 @@
 #   rebuild without touching the system closure, and a second user on this
 #   machine does not silently inherit your application list.
 # =============================================================================
-{ inputs, pkgs, ... }:
+{ self, inputs, pkgs, ... }:
 let
   # Packages that come from flake inputs rather than nixpkgs. Pulled out here
   # so the main list below stays readable.
@@ -72,5 +72,14 @@ in
   ++ [
     llm.claude-code       # the CLI
     llm.claude-desktop
+  ]
+
+  # --- iOS sideloading -----------------------------------------------------
+  # Installs SideStore etc onto a connected iPhone/iPad. Packaged in
+  # modules/features/ios-tools.nix (see that file for why it's not just a
+  # flake input), which also enables the usbmuxd daemon it needs to actually
+  # see the device.
+  ++ [
+    self.packages.${pkgs.stdenv.hostPlatform.system}.iloader
   ];
 }

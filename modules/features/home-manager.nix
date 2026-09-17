@@ -28,7 +28,7 @@
 #   That separation is what lets a second profile ship completely different
 #   dotfiles without touching this file.
 # =============================================================================
-{ inputs, ... }:
+{ self, inputs, ... }:
 {
   flake.nixosModules.homeManager =
     { config, ... }:
@@ -50,9 +50,10 @@
         # already written its own config.
         backupFileExtension = "backup";
 
-        # Make flake inputs reachable inside home/ modules, the same way they
-        # are in modules/. Without this, `inputs` is undefined over there.
-        extraSpecialArgs = { inherit inputs; inherit (config) my; };
+        # Make flake inputs (and this flake's own outputs, as `self` --
+        # needed for packages defined in perSystem, like `self.packages.iloader`)
+        # reachable inside home/ modules, the same way they are in modules/.
+        extraSpecialArgs = { inherit self inputs; inherit (config) my; };
       };
     };
 }

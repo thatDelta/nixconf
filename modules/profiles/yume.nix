@@ -31,6 +31,7 @@
         displayManager  # SDDM login screen + SilentSDDM theme
         portals         # file pickers, polkit agent, screen sharing
         homeManager     # the home-manager <-> NixOS bridge
+        iosTools        # usbmuxd, so iloader can see a plugged-in iPhone
       ];
 
       # Recorded so you can confirm which profile a booted generation came
