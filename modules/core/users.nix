@@ -26,6 +26,15 @@
           "input"
           "adbusers"        # android debugging
           "wireshark"       # packet capture without running it as root
+
+          # /dev/uinput is locked to this group by hardware.uinput.enable
+          # (turned on for Sunshine, features/sunshine.nix) -- that option
+          # creates the group and the udev rule, but adds no one to it.
+          # Sunshine runs as this user via a systemd --user service, and
+          # without this it opens fine but every attempt to create a virtual
+          # mouse/keyboard/touch device fails silently -- which looks exactly
+          # like "Moonlight connects, but input does nothing."
+          "uinput"
         ];
       };
 
