@@ -17,6 +17,7 @@
   flake.nixosModules.core = {
     imports = with self.nixosModules; [
       coreBoot
+      coreGraphics
       coreLocale
       coreNetwork
       coreKeyring
