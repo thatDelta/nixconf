@@ -32,6 +32,7 @@
         portals         # file pickers, polkit agent, screen sharing
         homeManager     # the home-manager <-> NixOS bridge
         iosTools        # usbmuxd, so iloader can see a plugged-in iPhone
+        sunshine        # stream this desktop to Moonlight (e.g. iPad)
       ];
 
       # Recorded so you can confirm which profile a booted generation came
