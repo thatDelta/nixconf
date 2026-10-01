@@ -39,6 +39,11 @@ in {
       middle-emulation = {};
       accel-profile = "adaptive";
     };
+    # Moonlight's touch/pen input arrives as virtual devices from Sunshine.
+    # Pin them to the iPad monitor (modules/hosts/tuturu/ipad-display.nix),
+    # otherwise taps get mapped onto the laptop screen.
+    touch.map-to-output = "HDMI-A-1";
+    tablet.map-to-output = "HDMI-A-1";
     focus-follows-mouse._props = {max-scroll-amount = "90%";};
     warp-mouse-to-focus = {};
     workspace-auto-back-and-forth = {};
@@ -56,12 +61,16 @@ in {
       };
     }
     {
+      # The fake iPad monitor (modules/hosts/tuturu/ipad-display.nix).
+      # Scale 1.5 -> 1573x1093 logical, so UI is the same physical-ish size
+      # as on the laptop. Placed to the RIGHT of the laptop screen; move the
+      # mouse off the right edge to reach it.
       _args = ["HDMI-A-1"];
-      mode = "1920x1080";
-      scale = 1.0;
+      mode = "2360x1640@59.980";
+      scale = 1.5;
       position._props = {
-        x = 0;
-        y = -1080;
+        x = 1920;
+        y = 0;
       };
     }
   ];
