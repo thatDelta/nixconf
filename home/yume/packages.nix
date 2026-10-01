@@ -48,6 +48,12 @@ in
     swayimg               # image viewer
     pwvucontrol           # audio mixer (PipeWire native)
 
+    # --- gaming -------------------------------------------------------------
+    # Epic Games Store / GOG / Amazon storefront client, plus a Wine/Proton
+    # frontend for running Windows-only games -- the Linux equivalent of the
+    # Epic/GOG launchers.
+    heroic
+
     # --- wayland utilities ------------------------------------------------
     # These are what make copy/paste, screenshots and X11 apps work. They look
     # optional and are not.
