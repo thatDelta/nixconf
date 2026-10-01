@@ -8,6 +8,20 @@
 # "add this line to your config" step.
 # =============================================================================
 {
+  # home-manager defaults every program's shell integration ON for every
+  # shell it knows how to integrate with -- bash, fish, zsh, nushell -- via
+  # one global switch (home.shell.enableShellIntegration). We only use fish,
+  # so disable the others explicitly rather than silently generating inert
+  # integration files (and, concretely, this nushell default is what broke
+  # the build here: fzf gates its nushell integration behind a minimum
+  # version our pinned nixpkgs doesn't meet, even though nothing we do
+  # touches nushell at all).
+  home.shell = {
+    enableBashIntegration = false;
+    enableNushellIntegration = false;
+    enableZshIntegration = false;
+  };
+
   programs.fish = {
     enable = true;
 
