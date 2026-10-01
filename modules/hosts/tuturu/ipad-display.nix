@@ -63,10 +63,14 @@
       ];
       boot.kernelParams = [ "i915.vbt_firmware=i915/tuturu-vbt.bin" ];
 
-      # Stream only the fake monitor. With KMS capture Sunshine numbers the
-      # displays in DRM order; eDP-1 (laptop) is 0, HDMI-A-1 is 1. If the
-      # iPad shows the laptop screen instead, `journalctl --user -u sunshine`
-      # lists the detected monitors -- put the right number here.
-      services.sunshine.settings.output_name = 1;
+      # Stream only the fake monitor. Sunshine captures through niri (its
+      # "wlgrab" backend, not KMS), which matches output_name against the
+      # monitor NAME -- the index "1" was ignored and it fell back to the
+      # laptop screen, i.e. mirroring. ~/.config/sunshine/sunshine.log lists
+      # the names it sees ("Monitor N is ...") and which one it "Selected".
+      #
+      # This is global: every Sunshine app (including the "iPad" one in
+      # ~/.config/sunshine/apps.json) streams this monitor.
+      services.sunshine.settings.output_name = "HDMI-A-1";
     };
 }
