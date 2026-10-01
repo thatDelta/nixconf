@@ -105,6 +105,14 @@ in
     # Epic/GOG launchers.
     heroic
 
+    # Minecraft: Prism manages instances/mods/Java versions; Lunar Client is a
+    # separate (unfree) pre-packaged client.
+    prismlauncher
+    lunar-client
+
+    # --- downloads ----------------------------------------------------------
+    qbittorrent
+
     # --- wayland utilities ------------------------------------------------
     # These are what make copy/paste, screenshots and X11 apps work. They look
     # optional and are not.
