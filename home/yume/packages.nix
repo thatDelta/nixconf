@@ -107,7 +107,10 @@ in
 
     # Minecraft: Prism manages instances/mods/Java versions; Lunar Client is a
     # separate (unfree) pre-packaged client.
-    prismlauncher
+    # jdks: the Javas Prism can pick from per instance. 21 covers 1.20.5+;
+    # 25 is for the newest releases. (Lunar Client ships its own Java, so
+    # 1.8.9 there needs nothing here.)
+    (prismlauncher.override { jdks = [ temurin-bin-21 temurin-bin-25 ]; })
     lunar-client
 
     # --- downloads ----------------------------------------------------------
