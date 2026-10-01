@@ -34,7 +34,11 @@
   flake.nixosModules.tuturuIpadHotspot =
     { pkgs, lib, ... }:
     {
-      # Create ap0 alongside wlp1s0 once the card shows up. The MAC is the
+      # Create ap0 alongside wlp1s0 once the card shows up. It is created as
+      # a plain "managed" interface on purpose: NetworkManager starts the
+      # hotspot through wpa_supplicant, which flips it into AP mode itself;
+      # created as type __ap (the hostapd recipe) NM just marks it
+      # "unavailable". The MAC is the
       # card's own with the "locally administered" bit set, so the two
       # interfaces don't share an address.
       systemd.services.wifi-ap0 = {
@@ -48,7 +52,7 @@
           RemainAfterExit = true;
         };
         script = ''
-          iw dev ap0 info >/dev/null 2>&1 || iw dev wlp1s0 interface add ap0 type __ap
+          iw dev ap0 info >/dev/null 2>&1 || iw dev wlp1s0 interface add ap0 type managed
           ip link set ap0 address ea:65:38:3e:63:29
         '';
         preStop = "iw dev ap0 del || true";
