@@ -20,7 +20,7 @@
 # CAVEAT: if you ever plug a REAL monitor into the HDMI port, it will be
 # told it is an iPad. Comment out the import line and rebuild first.
 #
-# TO DISCARD: delete this file, ipad-edid.py, and its line in configuration.nix (and
+# TO DISCARD: delete this file, ipad-edid.py, vbt-*, and its line in configuration.nix (and
 # optionally the niri bits above).
 # =============================================================================
 { ... }:
@@ -45,6 +45,23 @@
           mode = "e"; # force-enable with nothing connected
         };
       };
+
+      # Even with a correct EDID, i915 rejected 2360x1640@60 as CLOCK_HIGH:
+      # this laptop's VBT (the GPU's built-in board description) caps the
+      # HDMI port at 165 MHz, and the mode needs 255. ./vbt-patch.py clears
+      # that one field in a copy of the stock VBT (./vbt-original.bin), and
+      # i915.vbt_firmware makes the driver read the copy instead. Every
+      # other setting -- the laptop panel included -- is byte-identical.
+      #
+      # IF THE LAPTOP SCREEN EVER MISBEHAVES after this: pick the previous
+      # generation in the boot menu, then remove these two settings.
+      hardware.firmware = [
+        (pkgs.runCommand "tuturu-vbt" { nativeBuildInputs = [ pkgs.python3 ]; } ''
+          mkdir -p $out/lib/firmware/i915
+          python3 ${./vbt-patch.py} ${./vbt-original.bin} $out/lib/firmware/i915/tuturu-vbt.bin
+        '')
+      ];
+      boot.kernelParams = [ "i915.vbt_firmware=i915/tuturu-vbt.bin" ];
 
       # Stream only the fake monitor. With KMS capture Sunshine numbers the
       # displays in DRM order; eDP-1 (laptop) is 0, HDMI-A-1 is 1. If the
