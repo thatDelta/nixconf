@@ -18,6 +18,7 @@
         core               # the "it boots and works" baseline
         tuturuBwoah        # the second (Windows dynamic) drive
         tuturuIpadDisplay  # fake HDMI monitor streamed to the iPad
+        tuturuIpadHotspot  # 5 GHz hotspot from the laptop, for the iPad
       ];
 
       # --- who and what ------------------------------------------------------
