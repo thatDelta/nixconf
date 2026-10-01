@@ -6,7 +6,7 @@
 #   Nothing is plugged into HDMI-A-1. Two kernel-level settings make the GPU
 #   pretend something is:
 #     - a custom EDID (a monitor's "ID card") declaring the iPad 10th gen's
-#       native 2360x1640@60, generated from a modeline below;
+#       native 2360x1640@60, built by ./ipad-edid.py;
 #     - mode "e" = force this connector ENABLED even with no cable.
 #   niri then sees a real second monitor: drag windows onto it, scale it,
 #   position it. Sunshine streams ONLY that monitor to Moonlight on the iPad
@@ -20,34 +20,36 @@
 # CAVEAT: if you ever plug a REAL monitor into the HDMI port, it will be
 # told it is an iPad. Comment out the import line and rebuild first.
 #
-# TO DISCARD: delete this file and its line in configuration.nix (and
+# TO DISCARD: delete this file, ipad-edid.py, and its line in configuration.nix (and
 # optionally the niri bits above).
 # =============================================================================
 { ... }:
 {
-  flake.nixosModules.tuturuIpadDisplay = {
-    hardware.display = {
-      # `cvt -r 2360 1640 60` (CVT reduced blanking, 59.98 Hz, 255 MHz pixel
-      # clock -- well within this iGPU's HDMI limit). Exposed in the initrd
-      # as edid/ipad.bin.
-      #
-      # ratio=4:3: the generator only knows standard aspect ratios and refuses
-      # the iPad's ~1.44. The ratio only feeds a legacy low-res fallback entry
-      # (it ends up a junk 312x234 mode nobody picks); the real 2360x1640
-      # timing is the detailed one, verified with edid-decode.
-      edid.modelines."ipad" =
-        "255.00  2360 2408 2440 2520  1640 1643 1653 1687 +hsync -vsync ratio=4:3";
+  flake.nixosModules.tuturuIpadDisplay =
+    { pkgs, ... }:
+    {
+      hardware.display = {
+        # The EDID is built by ./ipad-edid.py (see the comment at its top for
+        # why the stock hardware.display.edid.modelines generator can't be
+        # used: its output made i915 drop every mode). Installed as
+        # lib/firmware/edid/ipad.bin, which is where the kernel looks.
+        edid.packages = [
+          (pkgs.runCommand "ipad-edid" { nativeBuildInputs = [ pkgs.python3 ]; } ''
+            mkdir -p $out/lib/firmware/edid
+            python3 ${./ipad-edid.py} $out/lib/firmware/edid/ipad.bin
+          '')
+        ];
 
-      outputs."HDMI-A-1" = {
-        edid = "ipad.bin";
-        mode = "e"; # force-enable with nothing connected
+        outputs."HDMI-A-1" = {
+          edid = "ipad.bin";
+          mode = "e"; # force-enable with nothing connected
+        };
       };
-    };
 
-    # Stream only the fake monitor. With KMS capture Sunshine numbers the
-    # displays in DRM order; eDP-1 (laptop) is 0, HDMI-A-1 is 1. If the
-    # iPad shows the laptop screen instead, `journalctl --user -u sunshine`
-    # lists the detected monitors -- put the right number here.
-    services.sunshine.settings.output_name = 1;
-  };
+      # Stream only the fake monitor. With KMS capture Sunshine numbers the
+      # displays in DRM order; eDP-1 (laptop) is 0, HDMI-A-1 is 1. If the
+      # iPad shows the laptop screen instead, `journalctl --user -u sunshine`
+      # lists the detected monitors -- put the right number here.
+      services.sunshine.settings.output_name = 1;
+    };
 }
