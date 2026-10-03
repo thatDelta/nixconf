@@ -86,7 +86,11 @@
       # The jellyfin package bakes its web directory into bin/jellyfin (a
       # shell wrapper). Rather than rebuilding Jellyfin from source to change
       # that, copy the wrapper and point it at abyssWeb; the rest is links.
-      jellyfinAbyss = pkgs.runCommand "jellyfin-abyss-${pkgs.jellyfin.version}" { } ''
+      # mainProgram: the NixOS module starts `lib.getExe package`, which
+      # otherwise guesses the binary from this derivation's name.
+      jellyfinAbyss = pkgs.runCommand "jellyfin-abyss-${pkgs.jellyfin.version}" {
+        meta.mainProgram = "jellyfin";
+      } ''
         mkdir $out
         ln -s ${pkgs.jellyfin}/* $out/
         rm $out/bin
