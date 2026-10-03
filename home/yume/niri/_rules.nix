@@ -151,6 +151,12 @@
       open-floating = true;
     }
     {
+      # Jellyfin is watched on the iPad: open it there, fullscreen.
+      match._props = {app-id = "org.jellyfin.JellyfinDesktop";};
+      open-on-output = "HDMI-A-1";
+      open-fullscreen = true;
+    }
+    {
       match._props = {app-id = "io.github.didley.CamOverla";};
       open-floating = true;
       open-on-output = "HDMI-A-1";
