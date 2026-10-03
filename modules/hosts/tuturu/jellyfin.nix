@@ -68,19 +68,20 @@
           inherit hash;
         };
 
-      # jellyfin-web, with everything symlinked except index.html, which is
-      # copied so the Spotlight <script> tag can be added before </body>.
+      # jellyfin-web plus Spotlight, with the <script> tag added to index.html.
+      # Real copies, not symlinks: Jellyfin sends a symlink's OWN size (~100
+      # bytes) as the file length, so every linked file arrived truncated and
+      # the web UI loaded as a blank page.
       abyssWeb = pkgs.runCommand "jellyfin-web-abyss" { } ''
         web=${pkgs.jellyfin-web}/share/jellyfin-web
-        mkdir $out
-        ln -s $web/* $out/
+        cp -r $web $out
+        chmod -R u+w $out
         mkdir $out/ui
-        rm $out/index.html
         sed 's|</body>|<script src="ui/spotlight-loader.js" data-abyss-spotlight></script></body>|' \
           $web/index.html > $out/index.html
-        ln -s ${spotlight "spotlight.html" "sha256-Y0Mdyt8BfiVAIvb4fm3LMhKbBtQCveIFLiGKQKgvVEk="} $out/ui/spotlight.html
-        ln -s ${spotlight "spotlight.css" "sha256-8ffaCcoc7OBiIhEV0V5wAt6nFIpl3fcqs8XpWutPre0="} $out/ui/spotlight.css
-        ln -s ${spotlight "spotlight-loader.js" "sha256-gnSXre8/guO3Hj3Q/ef72xd2G833JEVlu8kD8vXsG24="} $out/ui/spotlight-loader.js
+        cp ${spotlight "spotlight.html" "sha256-Y0Mdyt8BfiVAIvb4fm3LMhKbBtQCveIFLiGKQKgvVEk="} $out/ui/spotlight.html
+        cp ${spotlight "spotlight.css" "sha256-8ffaCcoc7OBiIhEV0V5wAt6nFIpl3fcqs8XpWutPre0="} $out/ui/spotlight.css
+        cp ${spotlight "spotlight-loader.js" "sha256-gnSXre8/guO3Hj3Q/ef72xd2G833JEVlu8kD8vXsG24="} $out/ui/spotlight-loader.js
       '';
 
       # The jellyfin package bakes its web directory into bin/jellyfin (a
