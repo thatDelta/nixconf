@@ -135,6 +135,7 @@ in
     atuin                 # searchable shell history
     grc                   # colourises command output
     imagemagick
+    gh                    # GitHub CLI; also logs git in to GitHub (gh auth login)
   ])
 
   # --- AI tooling -----------------------------------------------------------
