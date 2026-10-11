@@ -56,7 +56,7 @@
 { ... }:
 {
   flake.nixosModules.tuturuJellyfin =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     let
       # Pinned to one commit so a rebuild never changes the theme by
       # surprise. TO UPDATE: put a newer commit here; the rebuild then
@@ -129,6 +129,10 @@
           hardwareEncodingCodecs.hevc = true;
         };
       };
+
+      # Not started at boot: turn it on when you want to watch something
+      # (noctalia's control centre, or `tuturu-ctl toggle jellyfin`).
+      systemd.services.jellyfin.wantedBy = lib.mkForce [ ];
 
       # /mnt/bwoah is mounted as delta with 755 permissions, so the jellyfin
       # user can read it without anything extra. It only reads the videos;

@@ -20,6 +20,15 @@
       # Deduplicate identical files in the nix store. Reclaims a surprising
       # amount of disk over time.
       auto-optimise-store = true;
+
+      # Keep the build-time inputs of everything still installed when the
+      # weekly cleanup runs. iloader's flake generates part of its own Nix
+      # code at evaluation time (import-from-derivation), which needs a Rust
+      # toolchain; once the cleanup deleted it, every rebuild had to
+      # re-download several hundred MB before it could even start -- and
+      # froze on networks that throttle big downloads. Costs some disk.
+      keep-outputs = true;
+      keep-derivations = true;
     };
 
     # Old generations are what you roll back TO, so keep a month of them --

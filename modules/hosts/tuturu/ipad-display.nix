@@ -72,5 +72,32 @@
       # This is global: every Sunshine app (including the "iPad" one in
       # ~/.config/sunshine/apps.json) streams this monitor.
       services.sunshine.settings.output_name = "HDMI-A-1";
+
+      # --- switching between the fake iPad monitor and a real one ----------
+      # The kernel settings above make HDMI-A-1 the fake iPad at boot. This
+      # service only exists so the port can be flipped without a reboot:
+      #   stop  -> PHYSICAL: forget the iPad EDID and go back to detecting
+      #            whatever is really plugged in (a real monitor/TV works);
+      #   start -> VIRTUAL: the fake iPad monitor again.
+      # Toggle it from noctalia's control centre or `tuturu-ctl toggle hdmi`
+      # (toggles.nix). It lasts until reboot; every boot starts VIRTUAL.
+      systemd.services.hdmi-virtual = {
+        description = "HDMI-A-1 is the fake iPad monitor (stop = real monitor)";
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        # drm reads edid_firmware every time the port is probed, so changing
+        # it and re-probing (writing to the connector's status) is enough.
+        script = ''
+          echo "HDMI-A-1:edid/ipad.bin" > /sys/module/drm/parameters/edid_firmware
+          echo on > /sys/class/drm/card*-HDMI-A-1/status
+        '';
+        preStop = ''
+          echo "" > /sys/module/drm/parameters/edid_firmware
+          echo detect > /sys/class/drm/card*-HDMI-A-1/status
+        '';
+      };
     };
 }

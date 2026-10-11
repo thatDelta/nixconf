@@ -20,6 +20,7 @@
         tuturuIpadDisplay  # fake HDMI monitor streamed to the iPad
         tuturuIpadHotspot  # 5 GHz hotspot from the laptop, for the iPad
         tuturuJellyfin     # anime library on bwoah, watched on the iPad
+        tuturuToggles      # tuturu-ctl + control-centre buttons for the above
       ];
 
       # --- who and what ------------------------------------------------------

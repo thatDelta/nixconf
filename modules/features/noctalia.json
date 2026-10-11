@@ -384,6 +384,39 @@
           },
           {
             "id": "NoctaliaPerformance"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "device-ipad-horizontal",
+            "onClicked": "tuturu-ctl toggle ipad",
+            "onRightClicked": "tuturu-ctl notify",
+            "onMiddleClicked": "",
+            "generalTooltipText": "iPad mode: virtual monitor + hotspot + Sunshine (right click: status)",
+            "showExecTooltip": false,
+            "enableOnStateLogic": true,
+            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on ipad\",\"icon\":\"device-ipad-horizontal\"}]"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "cast",
+            "onClicked": "tuturu-ctl toggle sunshine",
+            "onRightClicked": "xdg-open https://localhost:47990",
+            "onMiddleClicked": "",
+            "generalTooltipText": "Sunshine streaming (right click: web UI)",
+            "showExecTooltip": false,
+            "enableOnStateLogic": true,
+            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on sunshine\",\"icon\":\"cast\"}]"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "access-point",
+            "onClicked": "tuturu-ctl toggle hotspot",
+            "onRightClicked": "tuturu-ctl notify",
+            "onMiddleClicked": "",
+            "generalTooltipText": "iPad hotspot tuturu-ipad (right click: status)",
+            "showExecTooltip": false,
+            "enableOnStateLogic": true,
+            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on hotspot\",\"icon\":\"access-point\"}]"
           }
         ],
         "right": [
@@ -398,6 +431,28 @@
           },
           {
             "id": "NightLight"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "movie",
+            "onClicked": "tuturu-ctl toggle jellyfin",
+            "onRightClicked": "jellyfin-desktop",
+            "onMiddleClicked": "",
+            "generalTooltipText": "Jellyfin library (right click: open player)",
+            "showExecTooltip": false,
+            "enableOnStateLogic": true,
+            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on jellyfin\",\"icon\":\"movie\"}]"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "device-tv",
+            "onClicked": "tuturu-ctl toggle hdmi",
+            "onRightClicked": "",
+            "onMiddleClicked": "",
+            "generalTooltipText": "HDMI: lit = fake iPad monitor, off = real monitor",
+            "showExecTooltip": false,
+            "enableOnStateLogic": true,
+            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on hdmi\",\"icon\":\"device-tv\"}]"
           }
         ]
       },
