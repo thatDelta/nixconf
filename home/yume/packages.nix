@@ -67,6 +67,9 @@ let
     pkgs.callPackage ./pkgs/claude-desktop/package.nix {
       flake = { inherit lib; };
       inherit codesignCheckHook formatelf;
+      # Only used by an upstream passthru test (signature check of the macOS
+      # build); never built here.
+      mkCodesignCheck = _: null;
     };
 in
 {
@@ -111,7 +114,15 @@ in
     # jdks: the Javas Prism can pick from per instance. 21 covers 1.20.5+;
     # 25 is for the newest releases. (Lunar Client ships its own Java, so
     # 1.8.9 there needs nothing here.)
-    (prismlauncher.override { jdks = [ temurin-bin-21 temurin-bin-25 ]; })
+    #
+    # Prism comes from nixpkgs-latest: 11.0.3's wrapper lacked libxkbcommon and
+    # libdecor, so GLFW couldn't open a native Wayland window under niri
+    # ("glfwInit failed"). The jdks stay on the main pkgs on purpose -- the
+    # instances store their Java's /nix/store path, which must not change.
+    (inputs.nixpkgs-latest.legacyPackages.${pkgs.stdenv.hostPlatform.system}.prismlauncher.override {
+      jdks = [ temurin-bin-21 temurin-bin-25 ];
+    })
+    zenity         # dialogs for games/launchers (LWJGL's tinyfiledialogs, NeoForge errors)
     lunar-client
 
     # --- downloads ----------------------------------------------------------
@@ -135,7 +146,6 @@ in
     atuin                 # searchable shell history
     grc                   # colourises command output
     imagemagick
-    gh                    # GitHub CLI; also logs git in to GitHub (gh auth login)
   ])
 
   # --- AI tooling -----------------------------------------------------------

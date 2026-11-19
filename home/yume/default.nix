@@ -24,6 +24,7 @@
     ./default-apps.nix # which app opens links, files, media
     ./shell.nix      # fish, starship, atuin
     ./neovim.nix     # neovim + LazyVim
+    ./weave.nix      # Weave mod loader (Lunar) + Weave Manager
     ./quickshell.nix # the noctalia desktop shell
     ./niri           # compositor config (keybinds, window rules)
   ];

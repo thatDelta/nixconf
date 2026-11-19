@@ -17,6 +17,7 @@
 #   better installed per-user through home-manager, which is why this list is
 #   deliberately short.
 # =============================================================================
+{ inputs, ... }:
 {
   flake.nixosModules.corePackages =
     { pkgs, ... }:
@@ -27,7 +28,8 @@
         vim         # a guaranteed editor; neovim is set up per-profile
         wget
         curl
-	opencode-desktop
+        # from nixpkgs-latest, so it can be updated on its own (see flake.nix)
+        inputs.nixpkgs-latest.legacyPackages.${pkgs.stdenv.hostPlatform.system}.opencode-desktop
 
         # --- everyday shell ------------------------------------------------
         fastfetch

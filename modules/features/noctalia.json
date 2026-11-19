@@ -380,11 +380,16 @@
             "id": "Bluetooth"
           },
           {
-            "id": "WallpaperSelector"
+            "id": "PowerProfile"
           },
           {
-            "id": "NoctaliaPerformance"
+            "id": "KeepAwake"
           },
+          {
+            "id": "NightLight"
+          }
+        ],
+        "right": [
           {
             "id": "CustomButton",
             "icon": "device-ipad-horizontal",
@@ -417,20 +422,6 @@
             "showExecTooltip": false,
             "enableOnStateLogic": true,
             "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on hotspot\",\"icon\":\"access-point\"}]"
-          }
-        ],
-        "right": [
-          {
-            "id": "Notifications"
-          },
-          {
-            "id": "PowerProfile"
-          },
-          {
-            "id": "KeepAwake"
-          },
-          {
-            "id": "NightLight"
           },
           {
             "id": "CustomButton",

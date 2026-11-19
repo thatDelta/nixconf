@@ -33,6 +33,8 @@
         homeManager     # the home-manager <-> NixOS bridge
         iosTools        # usbmuxd, so iloader can see a plugged-in iPhone
         sunshine        # stream this desktop to Moonlight (e.g. iPad)
+        psiphon         # censorship-circumvention proxy (tuturu-ctl on psiphon)
+        warp            # Cloudflare WARP VPN, tray icon + warp-cli
       ];
 
       # Recorded so you can confirm which profile a booted generation came

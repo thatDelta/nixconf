@@ -6,6 +6,7 @@
 #   tuturu-ctl notify                     same, as a notification
 #   tuturu-ctl on|off|toggle  THING       THING is one of:
 #       sunshine   streaming to Moonlight          (user service)
+#       psiphon    whole-system Psiphon VPN        (features/psiphon.nix)
 #       jellyfin   the anime library               (jellyfin.nix)
 #       hotspot    laptop Wi-Fi hotspot for iPad   (ipad-hotspot.nix)
 #       hdmi       fake iPad monitor vs a real one (ipad-display.nix)
@@ -33,6 +34,7 @@
               jellyfin) echo jellyfin.service ;;
               hotspot)  echo ipad-hotspot.service ;;
               hdmi)     echo hdmi-virtual.service ;;
+              psiphon)  echo psiphon.service ;;
               *)        return 1 ;;
             esac
           }
@@ -73,7 +75,7 @@
           }
 
           status() {
-            for t in sunshine jellyfin hotspot hdmi; do
+            for t in sunshine jellyfin hotspot hdmi psiphon; do
               if is_on "$t"; then s=on; else s=off; fi
               [ "$t" = hdmi ] && { [ $s = on ] && s="virtual (iPad)" || s="physical"; }
               printf '%-9s %s\n' "$t" "$s"
@@ -86,7 +88,7 @@
             is-on)  is_on "$2" ;;
             on|off) set_state "$1" "$2" ;;
             toggle) if is_on "$2"; then set_state off "$2"; else set_state on "$2"; fi ;;
-            *) echo "usage: tuturu-ctl status | on|off|toggle|is-on sunshine|jellyfin|hotspot|hdmi|ipad" >&2; exit 2 ;;
+            *) echo "usage: tuturu-ctl status | on|off|toggle|is-on sunshine|jellyfin|hotspot|hdmi|psiphon|ipad" >&2; exit 2 ;;
           esac
         '';
       };

@@ -206,15 +206,16 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1789073295,
-        "narHash": "sha256-FpWX9m5WtTYTXueKX41RP1Zhyf5UuuhrSIYITq+g+Ew=",
+        "lastModified": 1793206799,
+        "narHash": "sha256-AJMzQJcLEdfQic6chV2CwNzCzSfnGJ1NWzEef+Y8nn8=",
         "owner": "nab138",
         "repo": "iloader",
-        "rev": "348eefd7de78e9bc612c9d619b8b1e7a80ba3ba0",
+        "rev": "9797ecaf6ccdcfc68bd2ef4e0b1123910dd847b6",
         "type": "github"
       },
       "original": {
         "owner": "nab138",
+        "ref": "v2.4.1",
         "repo": "iloader",
         "type": "github"
       }
@@ -289,6 +290,22 @@
       "original": {
         "owner": "NixOS",
         "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-latest": {
+      "locked": {
+        "lastModified": 1792773339,
+        "narHash": "sha256-rZLrzrC6i+jnTAlvPZHogKDulY7WWDEv9hJeHieO7Zw=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "3ec636362e1816bc2f0888fa0fa2c69f1bc9e504",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -382,6 +399,7 @@
         "llm-agents": "llm-agents",
         "mynixpkgs": "mynixpkgs",
         "nixpkgs": "nixpkgs_3",
+        "nixpkgs-latest": "nixpkgs-latest",
         "sidra": "sidra",
         "silentSDDM": "silentSDDM",
         "wrapper-modules": "wrapper-modules"

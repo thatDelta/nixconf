@@ -10,6 +10,7 @@
   makeDesktopItem,
   unzip,
   codesignCheckHook,
+  mkCodesignCheck,
 
   # Directly linked (DT_NEEDED); autoPatchelfHook resolves these from
   # buildInputs and fails the build if any are missing.
@@ -57,6 +58,10 @@
   # Needed by the bundled virtiofsd, which backs Cowork's virtual machines.
   libcap_ng,
   libseccomp,
+
+  OVMF,
+  virtiofsd,
+  runCommandLocal,
 
   buildFHSEnv,
   mesa,
@@ -131,8 +136,26 @@ let
     };
   };
 
+  # Cowork's VM probes Debian's fixed firmware paths. qemu itself comes from
+  # the host PATH; bundling it grows the closure by ~0.8 GiB.
+  coworkFirmware =
+    let
+      dir = if stdenvNoCC.hostPlatform.isAarch64 then "AAVMF" else "OVMF";
+    in
+    runCommandLocal "claude-desktop-cowork-firmware" { } ''
+      mkdir -p $out/share/${dir}
+      ln -s ${OVMF.firmware} ${OVMF.variables} $out/share/${dir}/
+    '';
+
+  teamId = "Q6L2SF6YDW";
+
   passthru = {
     category = "AI Coding Agents";
+    tests.codesign = mkCodesignCheck {
+      name = pname;
+      inherit teamId;
+      srcs = [ (srcFor "aarch64-darwin") ];
+    };
   };
 
   meta = with lib; {
@@ -163,18 +186,11 @@ let
 
     src = srcFor platform;
 
-    # unzip: codesignCheckHook unpacks the darwin zip on Linux too.
     nativeBuildInputs = [
       formatelf
       copyDesktopItems
       makeWrapper
-      unzip
     ];
-
-    doInstallCheck = true;
-    nativeInstallCheckInputs = [ codesignCheckHook ];
-    codesignTeamId = "Q6L2SF6YDW";
-    codesignSources = [ (srcFor "aarch64-darwin") ];
 
     buildInputs = [
       adwaita-icon-theme
@@ -206,6 +222,7 @@ let
       nspr
       nss
       pango
+      pipewire
       systemdLibs
     ];
 
@@ -247,7 +264,6 @@ let
         --prefix LD_LIBRARY_PATH : "$out/lib/claude-desktop" \
         --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
         --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
         --add-flags ${lib.escapeShellArg commandLineArgs}
 
       runHook postInstall
@@ -279,7 +295,7 @@ let
 
     doInstallCheck = true;
     nativeInstallCheckInputs = [ codesignCheckHook ];
-    codesignTeamId = "Q6L2SF6YDW";
+    codesignTeamId = teamId;
 
     installPhase = ''
       runHook preInstall
@@ -315,9 +331,26 @@ else
       libgbm
       vulkan-loader
       systemdMinimal # /usr/bin/busctl, used to probe for desktop portals
+      virtiofsd
+      coworkFirmware
     ];
 
     runScript = "claude-desktop";
+
+    # buildFHSEnv links only a fixed list of host /etc entries (no gitconfig,
+    # xdg, ...). Link every entry the env does not provide itself.
+    extraPreBwrapCmds = ''
+      host_etc_args() {
+        local i
+        for i in /etc/*; do
+          case " /etc/ld.so.conf /etc/ld.so.cache ''${etc_ignored[*]} ''${symlinks[*]} " in
+          *" $i "* | *" $i/"*) ;;
+          *) echo --symlink "/.host-etc/''${i#/etc/}" "$i" ;;
+          esac
+        done
+      }
+    '';
+    extraBwrapArgs = [ "$(host_etc_args)" ];
 
     extraInstallCommands = ''
       ln -s ${unwrapped}/share $out/share

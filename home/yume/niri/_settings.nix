@@ -5,7 +5,10 @@ in {
 
   environment = {
     CLUTTER_BACKEND = "wayland";
-    DISPLAY = null;
+    # No `DISPLAY = null` here: niri sets DISPLAY itself for xwayland-satellite,
+    # and clearing it broke every X11-only app -- e.g. Minecraft/NeoForge, which
+    # forces GLFW onto X11 and failed with "glfwInit failed". Apps that support
+    # Wayland still pick it via the variables below.
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
     QT_QPA_PLATFORM = "wayland;xcb";

@@ -31,14 +31,18 @@
 
     services.logind.settings.Login = {
       # What the physical power button does.
-      powerKey = "suspend";
+      powerKey = "suspend-then-hibernate";
 
       # Closing the lid on battery suspends.
-      lidSwitch = "suspend";
+      lidSwitch = "suspend-then-hibernate";
 
       # Closing the lid while plugged in only locks -- so a download or build
       # can keep running with the lid shut.
-      lidSwitchExternalPower = "lock";
+      # Was "lock": close the lid on the charger, unplug, walk off -> it never
+      # slept and drained to 0. Now it sleeps, then hibernates after
+      # HibernateDelaySec. With an external monitor attached logind treats it
+      # as docked and still does nothing (HandleLidSwitchDocked=ignore).
+      lidSwitchExternalPower = "suspend-then-hibernate";
     };
 
     # --- hibernation -------------------------------------------------------
@@ -90,5 +94,21 @@
     # Lets you switch between power-saver / balanced / performance, which the
     # noctalia bar exposes as a toggle.
     services.power-profiles-daemon.enable = true;
+
+    # Charge limit 75-80%: this laptop lives on the dock, and sitting at 100%
+    # is what wears a Li-poly cell fastest. Dell firmware only honours the
+    # thresholds in its "Custom" charge mode -- with "Fast" (the default) it
+    # charged to 100% anyway. Applied at boot; the firmware keeps it after.
+    systemd.services.battery-charge-limit = {
+      description = "Limit battery charging to 80%";
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        b=/sys/class/power_supply/BAT0
+        echo Custom > $b/charge_types
+        echo 75 > $b/charge_control_start_threshold
+        echo 80 > $b/charge_control_end_threshold
+      '';
+    };
   };
 }

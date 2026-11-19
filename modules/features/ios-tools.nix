@@ -24,7 +24,8 @@
 #   under a SINGLE hash, so no per-dependency hashes are needed at all.
 #
 #   TO UPDATE after bumping the iloader input: the vendor hash below will
-#   mismatch. Run the rebuild, and Nix prints the correct hash -- paste it in.
+#   mismatch. Set it to "", run  nix build .#iloader.unwrapped.cargoDeps
+#   and paste the hash Nix prints (that vendors crates only, no compile).
 #
 # WHY FROM SOURCE RATHER THAN THEIR PREBUILT AppImage
 #   The AppImage was tried first and does not work here. It bundles GTK and
@@ -99,7 +100,7 @@
           # "source" is the directory name fetchCargoVendor unpacks src into.
           sourceRoot = "source/src-tauri";
 
-          hash = "sha256-te7XB/pkM9s94fUJadCtoOvcB/kEN/U1BwQMWcKPglM=";
+          hash = "sha256-Pv9V4aAU+QoCjJZSNpokDn+xt1uzQE6JtxH41y7vNQc=";
         };
       });
     in
@@ -115,6 +116,8 @@
       packages.iloader = pkgs.symlinkJoin {
         name = "iloader-${iloaderUnwrapped.version}";
         paths = [ iloaderUnwrapped ];
+        # `nix build .#iloader.unwrapped.cargoDeps` -> the new vendor hash after a bump
+        passthru.unwrapped = iloaderUnwrapped;
         nativeBuildInputs = [ pkgs.makeWrapper ];
 
         postBuild = ''

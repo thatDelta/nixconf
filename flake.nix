@@ -5,6 +5,12 @@
     # -- the package set everything is built from --------------------------
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # A newer nixpkgs used ONLY for the few apps you want fresher than the
+    # rest of the system (see modules/core/packages.nix). Updating `nixpkgs`
+    # itself rebuilds/re-downloads everything; bumping this one only touches
+    # what is taken from it:   nix flake update nixpkgs-latest
+    nixpkgs-latest.url = "github:nixos/nixpkgs/nixos-unstable";
+
     # -- structure ---------------------------------------------------------
     # flake-parts splits a flake into small composable modules.
     # import-tree then auto-imports every .nix file under ./modules, which is
@@ -52,7 +58,7 @@
     # for the one patch its flake needs. Deliberately NOT following nixpkgs --
     # it pins bun2nix and a Tauri/Rust toolchain that its own nixpkgs revision
     # is known to work with.
-    iloader.url = "github:nab138/iloader";
+    iloader.url = "github:nab138/iloader/v2.4.1";
   };
 
   # Every module under ./modules is imported automatically. Start reading at
