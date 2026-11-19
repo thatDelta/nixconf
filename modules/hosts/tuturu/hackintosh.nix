@@ -174,6 +174,15 @@
         });
       '';
 
+      # --- 5. boot menu entry for macOS -----------------------------------------
+      # OpenCore lives in \EFI\OC on this ESP (copied from the hackintosh repo's build, not managed by Nix).
+      # NixOS stays the default; NixOS is never booted THROUGH OpenCore.
+      boot.loader.systemd-boot.extraEntries."opencore.conf" = ''
+        title macOS Tahoe (OpenCore)
+        efi /EFI/OC/OpenCore.efi
+        sort-key z_opencore
+      '';
+
       # --- 4. read macOS volumes (read-only) ------------------------------------
       boot.extraModulePackages = [ config.boot.kernelPackages.apfs ];
     };
