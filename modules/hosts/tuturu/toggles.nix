@@ -7,7 +7,6 @@
 #   tuturu-ctl on|off|toggle  THING       THING is one of:
 #       sunshine   streaming to Moonlight          (user service)
 #       psiphon    whole-system Psiphon VPN        (features/psiphon.nix)
-#       jellyfin   the anime library               (jellyfin.nix)
 #       hotspot    laptop Wi-Fi hotspot for iPad   (ipad-hotspot.nix)
 #       hdmi       fake iPad monitor vs a real one (ipad-display.nix)
 #       ipad       all of the above for streaming to the iPad at once
@@ -15,7 +14,7 @@
 #
 # THE BUTTONS live in noctalia's control centre (modules/features/
 # noctalia.json, controlCenter.shortcuts): left click toggles, right click
-# opens the thing's page (Sunshine web UI, Jellyfin). A lit button is on.
+# opens the thing's page (Sunshine web UI). A lit button is on.
 #
 # NO PASSWORD PROMPTS: the polkit rule below lets your user start/stop
 # exactly these three system services, nothing else.
@@ -31,7 +30,6 @@
         text = ''
           unit_of() {
             case "$1" in
-              jellyfin) echo jellyfin.service ;;
               hotspot)  echo ipad-hotspot.service ;;
               hdmi)     echo hdmi-virtual.service ;;
               psiphon)  echo psiphon.service ;;
@@ -75,7 +73,7 @@
           }
 
           status() {
-            for t in sunshine jellyfin hotspot hdmi psiphon; do
+            for t in sunshine hotspot hdmi psiphon; do
               if is_on "$t"; then s=on; else s=off; fi
               [ "$t" = hdmi ] && { [ $s = on ] && s="virtual (iPad)" || s="physical"; }
               printf '%-9s %s\n' "$t" "$s"
@@ -88,7 +86,7 @@
             is-on)  is_on "$2" ;;
             on|off) set_state "$1" "$2" ;;
             toggle) if is_on "$2"; then set_state off "$2"; else set_state on "$2"; fi ;;
-            *) echo "usage: tuturu-ctl status | on|off|toggle|is-on sunshine|jellyfin|hotspot|hdmi|psiphon|ipad" >&2; exit 2 ;;
+            *) echo "usage: tuturu-ctl status | on|off|toggle|is-on sunshine|hotspot|hdmi|psiphon|ipad" >&2; exit 2 ;;
           esac
         '';
       };
@@ -98,7 +96,7 @@
 
       security.polkit.extraConfig = ''
         polkit.addRule(function (action, subject) {
-          var units = ["jellyfin.service", "ipad-hotspot.service", "hdmi-virtual.service"];
+          var units = ["ipad-hotspot.service", "hdmi-virtual.service"];
           if (action.id == "org.freedesktop.systemd1.manage-units" &&
               subject.user == "${config.my.username}" &&
               units.indexOf(action.lookup("unit")) >= 0) {

@@ -425,17 +425,6 @@
           },
           {
             "id": "CustomButton",
-            "icon": "movie",
-            "onClicked": "tuturu-ctl toggle jellyfin",
-            "onRightClicked": "jellyfin-desktop",
-            "onMiddleClicked": "",
-            "generalTooltipText": "Jellyfin library (right click: open player)",
-            "showExecTooltip": false,
-            "enableOnStateLogic": true,
-            "stateChecksJson": "[{\"command\":\"tuturu-ctl is-on jellyfin\",\"icon\":\"movie\"}]"
-          },
-          {
-            "id": "CustomButton",
             "icon": "device-tv",
             "onClicked": "tuturu-ctl toggle hdmi",
             "onRightClicked": "",

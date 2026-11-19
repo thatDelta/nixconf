@@ -99,7 +99,7 @@ in
 
     # --- media ------------------------------------------------------------
     mpv
-    jellyfin-desktop      # player for the Jellyfin library (modules/hosts/tuturu/jellyfin.nix)
+    # jellyfin-desktop  # OFF with tuturuJellyfin (modules/hosts/tuturu/jellyfin.nix)
     swayimg               # image viewer
     pwvucontrol           # audio mixer (PipeWire native)
 
