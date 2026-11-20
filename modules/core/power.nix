@@ -105,6 +105,8 @@
       serviceConfig.Type = "oneshot";
       script = ''
         b=/sys/class/power_supply/BAT0
+        # dell_laptop adds these files a few seconds after boot; this unit can start first.
+        for _ in $(seq 60); do [ -e $b/charge_types ] && break; sleep 0.5; done
         echo Custom > $b/charge_types
         echo 75 > $b/charge_control_start_threshold
         echo 80 > $b/charge_control_end_threshold
