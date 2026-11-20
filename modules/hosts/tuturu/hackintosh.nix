@@ -147,21 +147,21 @@
         KERNEL=="sd?", ENV{ID_SERIAL_SHORT}=="${sataSerial}", OWNER="${user}", MODE="0660"
       '';
 
-      # Lend the RTL8852BE (01:00.0) to the VM. stop = give it back to Linux.
+      # Lend the RTL8852BE (02:00.0) to the VM. stop = give it back to Linux.
       systemd.services.vfio-wifi = {
         description = "Detach the Wi-Fi card from Linux for the macOS VM";
         serviceConfig = { Type = "oneshot"; RemainAfterExit = true; };
         script = ''
-          dev=/sys/bus/pci/devices/0000:01:00.0
+          dev=/sys/bus/pci/devices/0000:02:00.0
           echo vfio-pci > $dev/driver_override
-          [ -e $dev/driver ] && echo 0000:01:00.0 > $dev/driver/unbind
-          echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+          [ -e $dev/driver ] && echo 0000:02:00.0 > $dev/driver/unbind
+          echo 0000:02:00.0 > /sys/bus/pci/drivers_probe
         '';
         preStop = ''
-          dev=/sys/bus/pci/devices/0000:01:00.0
+          dev=/sys/bus/pci/devices/0000:02:00.0
           echo > $dev/driver_override
-          [ -e $dev/driver ] && echo 0000:01:00.0 > $dev/driver/unbind
-          echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+          [ -e $dev/driver ] && echo 0000:02:00.0 > $dev/driver/unbind
+          echo 0000:02:00.0 > /sys/bus/pci/drivers_probe
         '';
       };
       security.polkit.extraConfig = ''
