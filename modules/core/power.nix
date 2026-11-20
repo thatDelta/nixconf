@@ -109,8 +109,8 @@
         # files never appear). Wait a bit, then reload dell_laptop once so the hook runs again.
         for _ in $(seq 20); do [ -e $b/charge_types ] && break; sleep 0.5; done
         if [ ! -e $b/charge_types ]; then
-          ${pkgs.kmod}/bin/modprobe -r dell_pc dell_laptop || true
-          ${pkgs.kmod}/bin/modprobe dell_laptop; ${pkgs.kmod}/bin/modprobe dell_pc || true
+          /run/current-system/sw/bin/modprobe -r dell_pc dell_laptop || true
+          /run/current-system/sw/bin/modprobe dell_laptop; /run/current-system/sw/bin/modprobe dell_pc || true
           for _ in $(seq 20); do [ -e $b/charge_types ] && break; sleep 0.5; done
         fi
         echo Custom > $b/charge_types
