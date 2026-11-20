@@ -164,11 +164,41 @@
           echo 0000:02:00.0 > /sys/bus/pci/drivers_probe
         '';
       };
+      # --- 6. S3 sleep test (docs/sleep.md step 1) --------------------------------
+      # Dell ships Name (SS3, Zero) so only s2idle is offered. This initrd ACPI upgrade loads the same DSDT with
+      # SS3 = One (OEM rev 2 -> 3; built from hw/capture-20261119/acpi/dsdt.dat by the hackintosh repo). Because the
+      # FADT has LOW_POWER_S0, the kernel keeps s2idle as default; "deep" just becomes available.
+      # s3-test.service: one S3 cycle, logged to /var/lib/hw-capture/s3-test.log, then back to s2idle.
+      boot.initrd.prepend = [ "${pkgs.runCommand "acpi-dsdt-ss3.cpio" { nativeBuildInputs = [ pkgs.cpio ]; } ''
+        mkdir -p kernel/firmware/acpi && cp ${./acpi/dsdt-ss3.aml} kernel/firmware/acpi/dsdt.aml
+        find kernel | cpio -H newc --create > $out
+      ''}" ];
+      systemd.services.s3-test = {
+        description = "One S3 (deep) suspend cycle with logging";
+        serviceConfig.Type = "oneshot";
+        path = [ pkgs.util-linux pkgs.systemd pkgs.gnugrep pkgs.coreutils ];
+        script = ''
+          log=/var/lib/hw-capture/s3-test.log
+          { echo "== $(date -Is) mem_sleep: $(cat /sys/power/mem_sleep)"
+            cat /sys/class/power_supply/BAT0/energy_now /sys/class/power_supply/BAT0/charge_now 2>/dev/null
+          } >> $log
+          echo deep > /sys/power/mem_sleep
+          echo 0 > /sys/power/pm_test 2>/dev/null || true
+          echo mem > /sys/power/state || echo "suspend failed rc=$?" >> $log
+          { echo "== resumed $(date -Is)"; cat /sys/class/power_supply/BAT0/energy_now /sys/class/power_supply/BAT0/charge_now 2>/dev/null
+            cat /sys/kernel/debug/suspend_stats 2>/dev/null || cat /sys/power/suspend_stats/* 2>/dev/null
+            dmesg | grep -iE "ACPI: PM|S3|PM: suspend|PM: resume|resume|wake" | tail -40
+          } >> $log
+          echo s2idle > /sys/power/mem_sleep
+          chmod 644 $log
+        '';
+      };
+
       security.polkit.extraConfig = ''
         polkit.addRule(function (action, subject) {
           if (action.id == "org.freedesktop.systemd1.manage-units" &&
               subject.user == "${user}" &&
-              /^(vfio-wifi|hw-capture)\.service$/.test(action.lookup("unit"))) {
+              /^(vfio-wifi|hw-capture|s3-test)\.service$/.test(action.lookup("unit"))) {
             return polkit.Result.YES;
           }
         });
