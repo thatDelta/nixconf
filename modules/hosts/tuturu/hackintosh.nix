@@ -178,14 +178,15 @@
         serviceConfig.Type = "oneshot";
         path = [ pkgs.util-linux pkgs.systemd pkgs.gnugrep pkgs.coreutils ];
         script = ''
+          set +e   # logging must never stop the test
           log=/var/lib/hw-capture/s3-test.log
           { echo "== $(date -Is) mem_sleep: $(cat /sys/power/mem_sleep)"
-            cat /sys/class/power_supply/BAT0/energy_now /sys/class/power_supply/BAT0/charge_now 2>/dev/null
+            cat /sys/class/power_supply/BAT0/charge_now
           } >> $log
           echo deep > /sys/power/mem_sleep
           echo 0 > /sys/power/pm_test 2>/dev/null || true
           echo mem > /sys/power/state || echo "suspend failed rc=$?" >> $log
-          { echo "== resumed $(date -Is)"; cat /sys/class/power_supply/BAT0/energy_now /sys/class/power_supply/BAT0/charge_now 2>/dev/null
+          { echo "== resumed $(date -Is)"; cat /sys/class/power_supply/BAT0/charge_now
             cat /sys/kernel/debug/suspend_stats 2>/dev/null || cat /sys/power/suspend_stats/* 2>/dev/null
             dmesg | grep -iE "ACPI: PM|S3|PM: suspend|PM: resume|resume|wake" | tail -40
           } >> $log
