@@ -105,8 +105,14 @@
       serviceConfig.Type = "oneshot";
       script = ''
         b=/sys/class/power_supply/BAT0
-        # dell_laptop adds these files a few seconds after boot; this unit can start first.
-        for _ in $(seq 60); do [ -e $b/charge_types ] && break; sleep 0.5; done
+        # dell_laptop's battery hook sometimes registers without adding these files (seen on several boots, the
+        # files never appear). Wait a bit, then reload dell_laptop once so the hook runs again.
+        for _ in $(seq 20); do [ -e $b/charge_types ] && break; sleep 0.5; done
+        if [ ! -e $b/charge_types ]; then
+          ${pkgs.kmod}/bin/modprobe -r dell_pc dell_laptop || true
+          ${pkgs.kmod}/bin/modprobe dell_laptop; ${pkgs.kmod}/bin/modprobe dell_pc || true
+          for _ in $(seq 20); do [ -e $b/charge_types ] && break; sleep 0.5; done
+        fi
         echo Custom > $b/charge_types
         echo 75 > $b/charge_control_start_threshold
         echo 80 > $b/charge_control_end_threshold
