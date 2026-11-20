@@ -169,7 +169,9 @@
       # SS3 = One (OEM rev 2 -> 3; built from hw/capture-20261119/acpi/dsdt.dat by the hackintosh repo). Because the
       # FADT has LOW_POWER_S0, the kernel keeps s2idle as default; "deep" just becomes available.
       # s3-test.service: one S3 cycle, logged to /var/lib/hw-capture/s3-test.log, then back to s2idle.
-      boot.initrd.prepend = [ "${pkgs.runCommand "acpi-dsdt-ss3.cpio" { nativeBuildInputs = [ pkgs.cpio ]; } ''
+      # RESULT 2026-11-21: S3 entered ("PM: suspend entry (deep)") but never resumed; power-button hard reset needed.
+      # Firmware S3 resume is dead, so the override is OFF (stock tables). Kept for reference; set to true to retest.
+      boot.initrd.prepend = lib.optionals false [ "${pkgs.runCommand "acpi-dsdt-ss3.cpio" { nativeBuildInputs = [ pkgs.cpio ]; } ''
         mkdir -p kernel/firmware/acpi && cp ${./acpi/dsdt-ss3.aml} kernel/firmware/acpi/dsdt.aml
         find kernel | cpio -H newc --create > $out
       ''}" ];
